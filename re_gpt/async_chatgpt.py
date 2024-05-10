@@ -5,7 +5,7 @@ import inspect
 import json
 import re
 import uuid
-from typing import AsyncGenerator, Callable, Optional
+from typing import AsyncGenerator, Callable, Optional, Union
 
 import websockets
 from curl_cffi.requests import AsyncSession
@@ -354,7 +354,7 @@ class AsyncConversation:
             self.parent_id = None
 
     @staticmethod
-    def decode_raw_json(raw_json_data: str) -> dict or bool:
+    def decode_raw_json(raw_json_data: str) -> Union[dict, bool]:
         """
         Decode JSON.
 
