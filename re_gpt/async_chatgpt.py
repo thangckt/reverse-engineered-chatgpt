@@ -22,8 +22,8 @@ from .utils import async_get_binary_path, get_model_slug
 
 # Constants
 USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/110.0.0.0 Safari/537.36"
-CHATGPT_API = "https://chat.openai.com/backend-api/{}"
-CHATGPT_FREE_API = "https://chat.openai.com/backend-anon/{}"
+CHATGPT_API = "https://chatgpt.com/backend-api/{}"
+CHATGPT_FREE_API = "https://chatgpt.com/backend-anon/{}"
 BACKUP_ARKOSE_TOKEN_GENERATOR = "https://arkose-token-generator.zaieem.repl.co/token"
 WS_REGISTER_URL = CHATGPT_API.format("register-websocket")
 
@@ -418,7 +418,7 @@ class AsyncChatGPT:
         self.websocket_mode = websocket_mode
         self.ws_loop = None
         self.ws_conversation_map = {}
-        
+
         # do not need session mode
         self.free_mode = True if self.session_token is None else False
         self.auth_cookie = None
@@ -477,8 +477,8 @@ class AsyncChatGPT:
             "Accept-Language": "en-US",
             "Accept-Encoding": "gzip, deflate, br",
             "Content-Type": "application/json",
-            "Origin": "https://chat.openai.com",
-            "Alt-Used": "chat.openai.com",
+            "Origin": "https://chatgpt.com",
+            "Alt-Used": "chatgpt.com",
             "Connection": "keep-alive",
             "Oai-device-id": self.devive_id,
         }
@@ -536,14 +536,14 @@ class AsyncChatGPT:
 
         Returns: authentication token.
         """
-        url = "https://chat.openai.com/api/auth/session"
+        url = "https://chatgpt.com/api/auth/session"
         cookies = {"__Secure-next-auth.session-token": self.session_token}
 
         headers = {
             "User-Agent": USER_AGENT,
             "Accept": "*/*",
             "Accept-Language": "en-US,en;q=0.5",
-            "Alt-Used": "chat.openai.com",
+            "Alt-Used": "chatgpt.com",
             "Connection": "keep-alive",
             "Sec-Fetch-Dest": "empty",
             "Sec-Fetch-Mode": "cors",
@@ -618,7 +618,7 @@ class AsyncChatGPT:
         url = CHATGPT_API.format("accounts/check/v4-2023-04-27")
 
         headers = self.build_request_headers()
-        
+
         raw_response = (await self.session.get(
             url=url, headers=headers
         ))
@@ -693,12 +693,12 @@ class AsyncChatGPT:
         return token
 
     async def fetch_free_mode_cookies(self):
-        home_url = "https://chat.openai.com/"
+        home_url = "https://chatgpt.com/"
         headers = {
             "User-Agent": USER_AGENT,
             "Accept": "*/*",
             "Accept-Language": "en-US,en;q=0.5",
-            "Alt-Used": "chat.openai.com",
+            "Alt-Used": "chatgpt.com",
             "Connection": "keep-alive",
             "Sec-Fetch-Dest": "empty",
             "Sec-Fetch-Mode": "cors",
@@ -709,5 +709,5 @@ class AsyncChatGPT:
         response = await self.session.get(url=home_url, headers=headers)
         response_cookies = response.cookies
         self.devive_id = response_cookies.get("oai-did")
-        
+
         return response_cookies

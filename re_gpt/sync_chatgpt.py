@@ -179,7 +179,7 @@ class SyncConversation(AsyncConversation):
             if chunk is None:
                 break
             yield chunk
-    
+
     def send_websocket_message(self, payload: dict) -> Generator[str, None, None]:
         """
         Send a message payload via WebSocket and receive the response.
@@ -196,7 +196,7 @@ class SyncConversation(AsyncConversation):
 
         def perform_request():
             nonlocal websocket_request_id
-            
+
             url = CHATGPT_API.format("conversation")
             headers = self.chatgpt.build_request_headers()
             # Add Chat Requirements Token
@@ -211,13 +211,13 @@ class SyncConversation(AsyncConversation):
             )).json()
 
             websocket_request_id = response.get("websocket_request_id")
-            
+
             if websocket_request_id is None:
                 raise UnexpectedResponseError("WebSocket request ID not found in response", response)
 
             if websocket_request_id not in self.chatgpt.ws_conversation_map:
                 self.chatgpt.ws_conversation_map[websocket_request_id] = response_queue
-            
+
         Thread(target=perform_request).start()
 
         while True:
@@ -387,11 +387,11 @@ class SyncChatGPT(AsyncChatGPT):
                 self.auth_token = self.fetch_auth_token()
             else:
                 self.auth_cookie = self.fetch_free_mode_cookies()
-            
+
         # automaticly check the status of websocket_mode
         if not self.websocket_mode:
             self.websocket_mode = self.check_websocket_availability()
-            
+
         if self.websocket_mode:
             def run_websocket():
                 asyncio.run(self.ensure_websocket())
@@ -458,14 +458,14 @@ class SyncChatGPT(AsyncChatGPT):
 
         Returns: authentication token.
         """
-        url = "https://chat.openai.com/api/auth/session"
+        url = "https://chatgpt.com/api/auth/session"
         cookies = {"__Secure-next-auth.session-token": self.session_token}
 
         headers = {
             "User-Agent": USER_AGENT,
             "Accept": "*/*",
             "Accept-Language": "en-US,en;q=0.5",
-            "Alt-Used": "chat.openai.com",
+            "Alt-Used": "chatgpt.com",
             "Connection": "keep-alive",
             "Sec-Fetch-Dest": "empty",
             "Sec-Fetch-Mode": "cors",
@@ -529,7 +529,7 @@ class SyncChatGPT(AsyncChatGPT):
         )
 
         return response.json()
-    
+
     def check_websocket_availability(self) -> bool:
         """
         Check if WebSocket is available.
@@ -540,7 +540,7 @@ class SyncChatGPT(AsyncChatGPT):
         url = CHATGPT_API.format("accounts/check/v4-2023-04-27")
 
         headers = self.build_request_headers()
-        
+
         raw_response = self.session.get(
             url=url, headers=headers
         )
@@ -552,14 +552,14 @@ class SyncChatGPT(AsyncChatGPT):
                     return 'shared_websocket' in response['accounts'][account_id]['features']
         except:
             raise UnexpectedResponseError('Could not enable ws_mode', raw_response.text)
-    
+
     async def ensure_websocket(self):
         ws_url_rsp = self.session.post(WS_REGISTER_URL, headers=self.build_request_headers()).json()
         ws_url = ws_url_rsp['wss_url']
         access_token = self.extract_access_token(ws_url)
         asyncio.create_task(self.ensure_close_websocket())
         await self.listen_to_websocket(ws_url, access_token)
-        
+
     async def ensure_close_websocket(self):
         while True:
             if self.stop_websocket_flag:
@@ -600,10 +600,10 @@ class SyncChatGPT(AsyncChatGPT):
             str: chat requirements token
         """
         url = CHATGPT_API.format("sentinel/chat-requirements")
-        
+
         if self.free_mode:
             url = CHATGPT_FREE_API.format("sentinel/chat-requirements")
-        
+
         response = self.session.post(
             url=url, headers=self.build_request_headers()
         )
@@ -612,12 +612,12 @@ class SyncChatGPT(AsyncChatGPT):
         return token
 
     def fetch_free_mode_cookies(self):
-        home_url = "https://chat.openai.com/"
+        home_url = "https://chatgpt.com/"
         headers = {
             "User-Agent": USER_AGENT,
             "Accept": "*/*",
             "Accept-Language": "en-US,en;q=0.5",
-            "Alt-Used": "chat.openai.com",
+            "Alt-Used": "chatgpt.com",
             "Connection": "keep-alive",
             "Sec-Fetch-Dest": "empty",
             "Sec-Fetch-Mode": "cors",
